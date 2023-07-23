@@ -16,7 +16,7 @@ export interface State {
 const initialState: State = {
     trainsList: [],
     isLoading: false,
-    error: '',
+    error: null,
 };
 
 export const reducer = createReducer(initialState, (builder) => {

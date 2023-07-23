@@ -27,7 +27,7 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
         console.log(speedList.sort((a, b) => a - b));
     }
 
-    const onChangeCharacteristicsValue = (e: any, i: number) => {
+    const onChangeCharacteristicsValue = (e: any, itemId: number) => {
         const inputName = e.target.name;
         const value = e.target.value;
 
@@ -39,8 +39,8 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
             } else {
                 isErrorAmperage = false;
             }
-            const newData = { ...newCharacteristics[i], [inputName]: Number(value), isErrorAmperage }
-            setNewCharacteristics({ ...newCharacteristics, [i]: newData });
+            const newData = { ...newCharacteristics[itemId], [inputName]: Number(value), isErrorAmperage }
+            setNewCharacteristics({ ...newCharacteristics, [itemId]: newData });
 
         } else if (inputName === 'force') {
             let isErrorForce = false;
@@ -51,8 +51,8 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
                 isErrorForce = true;
             }
 
-            const newData = { ...newCharacteristics[i], [inputName]: Number(value), isErrorForce }
-            setNewCharacteristics({ ...newCharacteristics, [i]: newData });
+            const newData = { ...newCharacteristics[itemId], [inputName]: Number(value), isErrorForce }
+            setNewCharacteristics({ ...newCharacteristics, [itemId]: newData });
         } else {
             let isErrorSpeed = false;
             if (!Number.isInteger(Number(value))) {
@@ -61,8 +61,8 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
             } else {
                 isErrorSpeed = false;
             }
-            const newData = { ...newCharacteristics[i], [inputName]: Number(value), isErrorSpeed }
-            setNewCharacteristics({ ...newCharacteristics, [i]: newData });
+            const newData = { ...newCharacteristics[itemId], [inputName]: Number(value), isErrorSpeed }
+            setNewCharacteristics({ ...newCharacteristics, [itemId]: newData });
         }
     }
 
@@ -77,7 +77,8 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
 
     useEffect(() => {
         let res = 0;
-        Object.values(newCharacteristics).forEach((el) => (el.isErrorSpeed || el.isErrorAmperage || el.isErrorForce) ? res += 1 : res);
+        Object.values(newCharacteristics).forEach((el) =>
+            (el.isErrorSpeed || el.isErrorAmperage || el.isErrorForce) ? res += 1 : res);
         setIsErrorInputValue(res === 0 ? false : true);
     }, [newCharacteristics]);
 
@@ -101,20 +102,19 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
                             <TableRow key={i} onChange={(e) => onChangeCharacteristicsValue(e, i)}>
                                 <td>
                                     <Input
+                                        name="engineAmperage" defaultValue={el[1].engineAmperage} type="number" required min={0}
                                         style={{ backgroundColor: el[1].isErrorAmperage ? '#ff4d4d' : '#dedede' }}
-                                        name="engineAmperage" defaultValue={el[1].engineAmperage}
-                                        type="number"
-                                        required
-                                        min={0}
                                     />
                                 </td>
                                 <td>
-                                    <Input name='force' defaultValue={el[1].force} type="number" required={true} step={0.01}
+                                    <Input
+                                        name='force' defaultValue={el[1].force} type="number" required={true} step={0.01}
                                         style={{ backgroundColor: el[1].isErrorForce ? '#ff4d4d' : '#dedede' }}
                                     />
                                 </td>
                                 <td>
-                                    <Input name="speed" defaultValue={el[1].speed} type="number" required min={0}
+                                    <Input
+                                        name="speed" defaultValue={el[1].speed} type="number" required min={0}
                                         style={{ backgroundColor: el[1].isErrorSpeed ? '#ff4d4d' : '#dedede' }}
                                     />
                                 </td>
