@@ -19,9 +19,7 @@ interface ICharacteristic {
 
 const TrainInfoModal = ({ info, onClose }: IProps) => {
     const [newCharacteristics, setNewCharacteristics] = useState<ICharacteristic>({});
-    const [isErrorInputValue, setIsErrorInputValue] = useState(0);
-
-    useEffect(() => console.log(isErrorInputValue), [isErrorInputValue]);
+    const [isErrorInputValue, setIsErrorInputValue] = useState(false);
 
     const onClickSendData = () => {
         const speedList: number[] = [];
@@ -32,16 +30,13 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
     const onChangeCharacteristicsValue = (e: any, i: number) => {
         const inputName = e.target.name;
         const value = e.target.value;
-        console.log(value);
 
         if (inputName === 'engineAmperage') {
             let isErrorAmperage = false;
             if (!Number.isInteger(Number(value)) || value.includes('-')) {
-                setIsErrorInputValue(isErrorInputValue + 1);
                 isErrorAmperage = true;
                 processErrorHandle(ERRORS.INTEGER);
             } else {
-                setIsErrorInputValue(isErrorInputValue === 0 ? 0 : isErrorInputValue - 1);
                 isErrorAmperage = false;
             }
             const newData = { ...newCharacteristics[i], [inputName]: Number(value), isErrorAmperage }
@@ -50,10 +45,8 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
         } else if (inputName === 'force') {
             let isErrorForce = false;
             if (/^(0|[1-9]\d*)(\.[0-9]{1,2})?$/.test(value) || Number.isInteger(Number(value))) {
-                setIsErrorInputValue(isErrorInputValue === 0 ? 0 : isErrorInputValue - 1);
                 isErrorForce = false;
             } else {
-                setIsErrorInputValue(isErrorInputValue + 1);
                 processErrorHandle(ERRORS.INCORRECT_VALUE);
                 isErrorForce = true;
             }
@@ -63,11 +56,9 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
         } else {
             let isErrorSpeed = false;
             if (!Number.isInteger(Number(value))) {
-                setIsErrorInputValue(isErrorInputValue + 1);
                 processErrorHandle(ERRORS.INTEGER);
                 isErrorSpeed = true;
             } else {
-                setIsErrorInputValue(isErrorInputValue === 0 ? 0 : isErrorInputValue - 1);
                 isErrorSpeed = false;
             }
             const newData = { ...newCharacteristics[i], [inputName]: Number(value), isErrorSpeed }
@@ -82,7 +73,13 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
             }), {})
             : {};
         setNewCharacteristics(newCharacteristics);
-    }, [info])
+    }, [info]);
+
+    useEffect(() => {
+        let res = 0;
+        Object.values(newCharacteristics).forEach((el) => (el.isErrorSpeed || el.isErrorAmperage || el.isErrorForce) ? res += 1 : res);
+        setIsErrorInputValue(res === 0 ? false : true);
+    }, [newCharacteristics]);
 
     return <Wrapper>
         <Content>
@@ -125,7 +122,7 @@ const TrainInfoModal = ({ info, onClose }: IProps) => {
                         )}
                     </tbody>
                 </table>
-                <SendDataButton type="submit" disabled={isErrorInputValue !== 0}>
+                <SendDataButton type="submit" disabled={isErrorInputValue}>
                     Отправить данные
                 </SendDataButton>
             </Form>
